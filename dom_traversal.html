@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOM Hierarchy Traversal & Manipulation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* FIXED: 2-COLUMN PROFILE HEADER */
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-size: 2.2em;
+        }
+
+        .header .info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+            max-width: 1000px;
+            margin: 25px auto 0;
+            padding: 25px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .header .info > div:nth-child(odd) {
+            flex: 1 1 45%;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            margin-bottom: 15px;
+            padding: 18px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+            border-left: 5px solid #2980b9;
+            transition: all 0.3s ease;
+        }
+
+        .header .info > div:nth-child(even) {
+            flex: 1 1 45%;
+            background: linear-gradient(135deg, #27ae60, #229954);
+            color: white;
+            margin-bottom: 15px;
+            padding: 18px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+            border-left: 5px solid #229954;
+            transition: all 0.3s ease;
+        }
+
+        .header .info div:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .label {
+            display: block;
+            font-size: 0.95em;
+            opacity: 0.95;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        /* Rest of your existing styles */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .controls {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-traverse {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-manipulate {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+
+       .btn-link {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 8px 16px;
+            margin-top: 8px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 0.9em;
+            font-weight: 600;
+            border: 2px solid rgba(255,255,255,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .btn-link:hover {
+            background: rgba(255,255,255,0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            color: white;
+            text-decoration: none;
+        }
+
+
+        .child .btn-link,
+        .parent .btn-link,
+        .grandparent .btn-link {
+            display: inline-block !important;
+            margin-top: 8px;
+            font-size: 0.95em;
+        }
+
+        .child:hover .btn-link,
+        .parent:hover .btn-link,
+        .grandparent:hover .btn-link {
+            background: rgba(255,255,255,0.5) !important;
+        }
+
+        .btn-link {
+            cursor: pointer !important;
+        }
+
+        .hierarchy-container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            min-height: 400px;
+        }
+
+        .hierarchy-title {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+        }
+
+        /* Hierarchy styling */
+        .grandparent {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(243, 156, 18, 0.4);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .parent {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: white;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 10px;
+            box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-left: 30px;
+        }
+
+        .child {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            color: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(155, 89, 182, 0.4);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-left: 50px;
+        }
+
+        /* Selection highlight */
+        .highlight {
+            transform: scale(1.05);
+            box-shadow: 0 12px 40px rgba(255, 215, 0, 0.6) !important;
+            border: 3px solid #ffd700;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 12px 40px rgba(255, 215, 0, 0.6); }
+            50% { box-shadow: 0 12px 50px rgba(255, 215, 0, 0.9); }
+            100% { box-shadow: 0 12px 40px rgba(255, 215, 0, 0.6); }
+        }
+
+        .node-type {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        .status {
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header .info {
+                flex-direction: column;
+            }
+            .header .info > div:nth-child(odd),
+            .header .info > div:nth-child(even) {
+                flex: 1 1 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- FIXED: 2-COLUMN PROFILE HEADER -->
+    <div class="header">
+        <h1>MARNELIE D. CANICULA</h1>
+        <div class="info">
+            <div><span class="label">Complete Name:</span> Marnelie D. Canicula</div>
+            <div><span class="label">Sex:</span> Female</div>
+            <div><span class="label">Address:</span> Zone 1, Turague Sagnay Cam. Sur</div>
+            <div><span class="label">Course, Year & Section:</span> BSIT, 2nd Year, Section D</div>
+            <div><span class="label">Name of School:</span> Partido State University</div>
+            <div><span class="label">Semester & Academic Year:</span> 1st Semester, 2025-2026</div>
+            <div><span class="label">Course Code & Title:</span> PF2 - Event Driven Programming</div>
+            <div><span class="label">Subject Instructor:</span> Mr. Arjay F. Abio</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="controls">
+            <button class="btn btn-traverse" id="traverseDown">↓ Traverse Down</button>
+            <button class="btn btn-traverse" id="traverseUp">↑ Traverse Up</button>
+            <button class="btn btn-traverse" id="traverseNext">→ Next Sibling</button>
+            <button class="btn btn-traverse" id="traversePrev">← Prev Sibling</button>
+            <button class="btn btn-manipulate" id="addChild">➕ Add Child</button>
+            <button class="btn btn-manipulate" id="deleteCurrent">🗑️ Delete Current</button>
+        </div>
+
+        <div class="hierarchy-container">
+            <h2 class="hierarchy-title">DOM Hierarchy Traversal & Manipulation</h2>
+            
+            <!-- FIXED: Grandparent Node with clickable links -->
+            <div class="grandparent" data-type="grandparent">
+                <div style="font-size: 1.5em; font-weight: bold;">🎮 GUESS THE WORD</div>
+                <div class="node-type">grandparent</div>
+                <a href="https://canicula-marnelie-06.github.io/Guessing-game/index.html" class="btn-link" target="_blank">
+                    Activity 1: Guess the Secret Word Game
+                </a>
+                
+                
+        
+        <!-- Parent 1 -->
+        <div class="parent" data-type="parent">
+            <div style="font-size: 1.3em; font-weight: bold;">📊 BROWSER ENVIRONMENT DASHBOARD</div>
+            <div class="node-type">Parent Node</div>
+            
+            <!-- Child 1: Frontend (no link) -->
+            <div class="child" data-type="child">
+                <div style="font-size: 1.1em;">💻 Frontend</div>
+                 <a href="https://canicula-marnelie-06.github.io/BROWSER_DASHBOARD/BED/index.html" class="btn-link" target="_blank">
+                View Dashboard →
+            </a>
+            </div>
+            
+            <!-- Child 2: Backend (ONLY link clickable) -->
+            <div class="child" data-type="child">
+                <div style="font-size: 1.1em;">🔧 Backend</div>
+                <a href="https://canicula-marnelie-06.github.io/BROWSER_DASHBOARD/BED/browser_dashboard.html" class="btn-link" target="_blank">
+                    Activity 2: Browser Environment Dashboard →
+                </a>
+            </div>
+        </div>
+
+        <!-- Parent 2 -->
+        <div class="parent" data-type="parent">
+            <div style="font-size: 1.3em; font-weight: bold;">📱 BROWSER DASHBOARD</div>
+            <a href="https://canicula-marnelie-06.github.io/BROWSER_DASHBOARD/BED/index.html" class="btn-link" target="_blank">
+                View Dashboard →
+            </a>
+            
+            <div class="child" data-type="child">
+                <div style="font-size: 1.1em;">✅ TASKIFY</div>
+                <a href="https://canicula-marnelie-06.github.io/TASKIFY/task.html" class="btn-link" target="_blank">
+                    View Taskify →
+                </a>
+            </div>
+        </div>
+    </div>
+            <div class="status" id="status">Click any node to select it! Links are clickable too! 🚀</div>
+        </div>
+
+        <script>
+        // Global variables
+        let selectedNode = null;
+        const statusDiv = document.getElementById('status');
+
+        // Update status message
+        function updateStatus(message) {
+            statusDiv.textContent = message;
+        }
+
+        // Clear highlight from all nodes
+        function clearHighlight() {
+            document.querySelectorAll('.grandparent, .parent, .child').forEach(node => {
+                node.classList.remove('highlight');
+            });
+        }
+
+        // Node selection handler
+        // FIXED: Node selection handler - Links don't trigger node selection
+function setupNodeSelection() {
+    document.querySelectorAll('.grandparent, .parent, .child').forEach(node => {
+        node.addEventListener('click', function(e) {
+            // FIXED: Prevent node selection when clicking links
+            if (e.target.classList.contains('btn-link') || 
+                e.target.closest('.btn-link')) {
+                return true; // Allow link navigation
+            }
+            
+            e.stopPropagation();
+            
+            // Clear previous selection
+            clearHighlight();
+            
+            // Highlight new selection
+            this.classList.add('highlight');
+            selectedNode = this;
+            
+            const nodeType = this.dataset.type;
+            const nodeText = this.querySelector('div[style*="font-size"]').textContent.trim();
+            updateStatus(`Selected: ${nodeText} (${nodeType})`);
+        });
+    });
+}
+
+        // Traverse Down - Move to first direct child
+        function traverseDown() {
+            if (!selectedNode) {
+                updateStatus('No node selected!');
+                return;
+            }
+
+            const firstChild = selectedNode.querySelector('.parent, .child');
+            if (firstChild) {
+                clearHighlight();
+                firstChild.classList.add('highlight');
+                selectedNode = firstChild;
+                updateStatus(`Moved down to: ${firstChild.textContent.trim().split('\n')[0]}`);
+            } else {
+                updateStatus('No children available!');
+            }
+        }
+
+        // Traverse Up - Move to parent
+        function traverseUp() {
+            if (!selectedNode) {
+                updateStatus('No node selected!');
+                return;
+            }
+
+            const parent = selectedNode.parentElement.closest('.grandparent, .parent');
+            if (parent && parent !== selectedNode) {
+                clearHighlight();
+                parent.classList.add('highlight');
+                selectedNode = parent;
+                updateStatus(`Moved up to: ${parent.textContent.trim().split('\n')[0]}`);
+            } else {
+                updateStatus('Already at top level!');
+            }
+        }
+
+        // Traverse Next Sibling
+        function traverseNextSibling() {
+            if (!selectedNode) {
+                updateStatus('No node selected!');
+                return;
+            }
+
+            const sibling = selectedNode.nextElementSibling;
+            if (sibling && (sibling.classList.contains('parent') || sibling.classList.contains('child'))) {
+                clearHighlight();
+                sibling.classList.add('highlight');
+                selectedNode = sibling;
+                updateStatus(`Moved to next sibling: ${sibling.textContent.trim().split('\n')[0]}`);
+            } else {
+                updateStatus('No next sibling available!');
+            }
+        }
+
+        // Traverse Previous Sibling
+        function traversePrevSibling() {
+            if (!selectedNode) {
+                updateStatus('No node selected!');
+                return;
+            }
+
+            const sibling = selectedNode.previousElementSibling;
+            if (sibling && (sibling.classList.contains('parent') || sibling.classList.contains('child'))) {
+                clearHighlight();
+                sibling.classList.add('highlight');
+                selectedNode = sibling;
+                updateStatus(`Moved to previous sibling: ${sibling.textContent.trim().split('\n')[0]}`);
+            } else {
+                updateStatus('No previous sibling available!');
+            }
+        }
+
+        // Add Child Node
+        function addChild() {
+            if (!selectedNode) {
+                updateStatus('No node selected!');
+                return;
+            }
+
+            const nodeType = selectedNode.dataset.type;
+
+            if (nodeType === 'child') {
+                alert('Cannot add children to child nodes!');
+                updateStatus('Cannot add children to child nodes!');
+                return;
+            }
+
+            if (nodeType === 'grandparent') {
+                // Add new parent with two children
+                const newParent = document.createElement('div');
+                newParent.className = 'parent';
+                newParent.dataset.type = 'parent';
+                newParent.innerHTML = `
+                    <div style="font-size: 1.3em; font-weight: bold;">🏭 New Department ${Date.now().toString().slice(-4)}</div>
+                    <div class="node-type">Parent Node</div>
+                    <div class="child" data-type="child">
+                        <div style="font-size: 1.1em;">👥 Team A</div>
+                        <div class="node-type">Child Node</div>
+                    </div>
+                    <div class="child" data-type="child">
+                        <div style="font-size: 1.1em;">👥 Team B</div>
+                        <div class="node-type">Child Node</div>
+                    </div>
+                `;
+                selectedNode.appendChild(newParent);
+            } else if (nodeType === 'parent') {
+                // Add new child to parent
+                const newChild = document.createElement('div');
+                newChild.className = 'child';
+                newChild.dataset.type = 'child';
+                newChild.innerHTML = `
+                    <div style="font-size: 1.1em;">⭐ New Team ${Date.now().toString().slice(-3)}</div>
+                    <div class="node-type">Child Node</div>
+                `;
+                selectedNode.appendChild(newChild);
+            }
+
+            // Re-setup event listeners for new nodes
+            setupNodeSelection();
+            updateStatus('New child/parent added successfully!');
+        }
+
+        // Delete Current Node
+        function deleteCurrent() {
+            if (!selectedNode) {
+                updateStatus('No node selected!');
+                return;
+            }
+
+            const nodeType = selectedNode.dataset.type;
+
+            if (nodeType === 'grandparent') {
+                alert('Cannot delete the grandparent node!');
+                updateStatus('Cannot delete grandparent node!');
+                return;
+            }
+
+            // Clear selection and remove node
+            clearHighlight();
+            selectedNode.remove();
+            selectedNode = null;
+            updateStatus('Selected node deleted!');
+        }
+
+        // Event Listeners for buttons
+        document.getElementById('traverseDown').addEventListener('click', traverseDown);
+        document.getElementById('traverseUp').addEventListener('click', traverseUp);
+        document.getElementById('traverseNext').addEventListener('click', traverseNextSibling);
+        document.getElementById('traversePrev').addEventListener('click', traversePrevSibling);
+        document.getElementById('addChild').addEventListener('click', addChild);
+        document.getElementById('deleteCurrent').addEventListener('click', deleteCurrent);
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            setupNodeSelection();
+            updateStatus('Click any node to select it! Use buttons to traverse or manipulate.');
+        });
+    </script>
+</body>
+</html>
