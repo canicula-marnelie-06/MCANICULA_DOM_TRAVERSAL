@@ -128,7 +128,7 @@
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+            box-shadow: 0 6px 20px rgba(243, 5, 211, 0.2);
         }
 
        .btn-link {
@@ -189,7 +189,7 @@
 
         /* Hierarchy styling */
         .grandparent {
-            background: linear-gradient(135deg, #f39c12, #e67e22);
+            background: linear-gradient(135deg, #0ce9b5, #09dda1);
             color: white;
             padding: 25px;
             margin-bottom: 20px;
@@ -233,7 +233,7 @@
         }
 
         @keyframes pulse {
-            0% { box-shadow: 0 12px 40px rgba(255, 215, 0, 0.6); }
+            0% { box-shadow: 0 12px 40px rgba(80, 221, 249, 0.6); }
             50% { box-shadow: 0 12px 50px rgba(255, 215, 0, 0.9); }
             100% { box-shadow: 0 12px 40px rgba(255, 215, 0, 0.6); }
         }
@@ -267,7 +267,7 @@
     </style>
 </head>
 <body>
-    <!-- FIXED: 2-COLUMN PROFILE HEADER -->
+    
     <div class="header">
         <h1>MARNELIE D. CANICULA</h1>
         <div class="info">
@@ -299,9 +299,6 @@
             <div class="grandparent" data-type="grandparent">
                 <div style="font-size: 1.5em; font-weight: bold;">GRANDPARENT</div>
                 
-                <a href="https://canicula-marnelie-06.github.io/Guessing-game/index.html" class="btn-link" target="_blank">
-                     Guess the Secret Word Game
-                </a>
                 
                 
         
@@ -313,30 +310,26 @@
             <!-- Child 1: Frontend (no link) -->
             <div class="child" data-type="child">
                 <div style="font-size: 1.1em;">CHILD 1</div>
-                 <a href="https://canicula-marnelie-06.github.io/BROWSER_DASHBOARD/BED/index.html" class="btn-link" target="_blank">
-                View Dashboard →
-            </a>
+                 
             </div>
             
             <!-- Child 2: Backend (ONLY link clickable) -->
             <div class="child" data-type="child">
                 <div style="font-size: 1.1em;">CHILD 2</div>
-                <a href="https://canicula-marnelie-06.github.io/BROWSER_DASHBOARD/BED/browser_dashboard.html" class="btn-link" target="_blank">
-                    Activity 2: Browser Environment Dashboard →
-                </a>
+                
             </div>
         </div>
 
         <!-- Parent 2 -->
         <div class="parent" data-type="parent">
-            <div style="font-size: 1.3em; font-weight: bold;">PARENT</div>
+            <div style="font-size: 1.3em; font-weight: bold;">PARENT 2</div>
             
+            
+            </a>
             
             <div class="child" data-type="child">
                 <div style="font-size: 1.1em;">CHILD 1</div>
-                <a href="https://canicula-marnelie-06.github.io/TASKIFY/task.html" class="btn-link" target="_blank">
-                    View Taskify →
-                </a>
+                
             </div>
         </div>
     </div>
@@ -361,7 +354,7 @@
         }
 
         // Node selection handler
-        // FIXED: Node selection handler - Links don't trigger node selection
+        
 function setupNodeSelection() {
     document.querySelectorAll('.grandparent, .parent, .child').forEach(node => {
         node.addEventListener('click', function(e) {
@@ -498,8 +491,8 @@ function setupNodeSelection() {
                 newChild.className = 'child';
                 newChild.dataset.type = 'child';
                 newChild.innerHTML = `
-                    <div style="font-size: 1.1em;">⭐ New Team ${Date.now().toString().slice(-3)}</div>
-                    <div class="node-type">Child Node</div>
+                    <div style="font-size: 1.1em;">CHILD</div>
+                    
                 `;
                 selectedNode.appendChild(newChild);
             }
